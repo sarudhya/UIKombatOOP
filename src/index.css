@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap');
+
+.medieval-Sharp {
+  font-family: 'MedievalSharp', cursive !important;
+  font-size: 96px !important;
+}
+
+.UncialFont{
+  font-family: 'Uncial Antiqua';
+  font-size: 75px !important;
+}
+
+.BG{
+  width: 1920;
+  height: 1080;
+  background-size: auto;
+  background-image:  url('./SVG/Start.svg');
+}
+

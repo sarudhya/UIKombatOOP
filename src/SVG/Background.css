@@ -1,0 +1,17 @@
+.start-Background {
+  width: 100%;
+  height: 100vh;
+  background-image: url('./Start.svg'); 
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.confirmNumberBG{
+  width: 100%;
+  height: 100vh;
+  background-image: url('./ConfirmNumber.svg'); 
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
