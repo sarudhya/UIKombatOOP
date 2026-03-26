@@ -219,7 +219,7 @@ import SockJS from "sockjs-client";
             formData.append("File", data.file);
 
             // backend mapping: POST /strategy/{gameID}/{minionTypeID}
-            const response = await fetch(`/strategy/${data.gameID}/${data.minionTypeID}`, {
+            const response = await fetch(`/minion/strategy/${data.gameID}/${data.minionTypeID}`, {
                 method: "POST",
                 body: formData,
             });
