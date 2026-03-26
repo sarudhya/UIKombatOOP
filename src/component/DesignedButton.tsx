@@ -1,5 +1,5 @@
-import React, { Children, useState, ReactNode, CSSProperties, ButtonHTMLAttributes } from "react";
-  
+import React, { useState, ReactNode, CSSProperties, ButtonHTMLAttributes } from "react";
+
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   color?: string;
@@ -8,6 +8,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   top?: string | number;
   left?: string | number;
   style?: CSSProperties;
+  disableHover?: boolean;
 }
 
 const DesignedButton = ({
@@ -17,52 +18,74 @@ const DesignedButton = ({
   fontColor = "#D3B14D",
   top,
   left,
-  style,
+  style = {},
+  disableHover = false,
   ...rest
 }: Props) => {
 
-    const [isHovered, setIsHovered] = useState(false);
-    const [isActive, setIsActive] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isActive, setIsActive] = useState(false);
 
-    const hoverColor = "#464C10"; 
-    const hoverFont = "#D6B580"
-    const activeColor = "#6F92AE";
-    const activeFont = "#2A0B11";
+  const hoverColor = "#464C10";
+  const hoverFont = "#D6B580";
+
+  const activeColor = "#6F92AE";
+  const activeFont = "#2A0B11";
+
+  const bgColor = disableHover
+    ? color
+    : isActive
+      ? activeColor
+      : isHovered
+        ? hoverColor
+        : color;
+
+  const textColor = disableHover
+    ? fontColor
+    : isActive
+      ? activeFont
+      : isHovered
+        ? hoverFont
+        : fontColor;
 
   return (
     <button
-      className="btn medieval-Sharp"
+      className={`btn medieval-Sharp ${rest.className || ""}`}
       onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => { setIsHovered(false); setIsActive(false); }}
-      onMouseDown={() => setIsActive(true)}
-      onMouseUp={() => setIsActive(false)}
+
+      onMouseEnter={() => !disableHover && setIsHovered(true)}
+      onMouseLeave={() => {
+        if (!disableHover) {
+          setIsHovered(false);
+          setIsActive(false);
+        }
+      }}
+      onMouseDown={() => !disableHover && setIsActive(true)}
+      onMouseUp={() => !disableHover && setIsActive(false)}
+
       {...rest}
+
       style={{
-        backgroundColor: isActive ? activeColor : (isHovered ? hoverColor : color),
-        color: isActive ? activeFont : (isHovered ? hoverFont :fontColor),
-        
+        backgroundColor: bgColor,
+        color: textColor,
+
         position: "absolute",
-        top: top,
-        left: left,
-        
+        top,
+        left,
+
         border: "none",
         outline: "none",
-        
-        borderRadius: 35,
-        width: 455,
-        height: 128,
-        display: "flex",          
-        justifyContent: "center", // จัดกึ่งกลางแนวนอน (X)
-        alignItems: "center",     // จัดกึ่งกลางแนวตั้ง (Y)
-        padding: 25,
 
-        ...style,        
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+
+        ...style
       }}
     >
       {children}
     </button>
   );
 };
-    
+
 export default DesignedButton;

@@ -10,4 +10,18 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  define: {
+    global: 'window',
+  },
+  server: {
+    proxy: {
+      '/select-mode': 'http://localhost:8080',
+      '/minion': 'http://localhost:8080',
+      '/config': 'http://localhost:8080',
+      '/ws': {
+        target: 'http://localhost:8080',
+        ws: true,
+      }
+    }
+  }
 })

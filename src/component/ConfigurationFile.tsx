@@ -1,117 +1,197 @@
-import React from 'react'
-import ConfigSVG from "../SVG/ConfigFile.svg"
+import React, { useState } from "react";
+import ConfigSVG from "../SVG/ConfigFile.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import DesignedButton from "./DesignedButton";
 import BackIconSvg from "../SVG/BackBtn.svg";
+import CustomAlert from "./CustomAlert";
+import { API } from "../api";
+import { loadGameSessionFromStorage } from "../constants/gameSession";
+import { type StrategyData } from "../constants/strategyTypes";
+import {
+  createGameConfigFormFromConfig,
+  clearConfigDraftStorage,
+  GAME_CONFIG_FIELDS,
+  loadConfigDraftFromStorage,
+  loadConfigFromStorage,
+  parseGameConfigForm,
+  saveConfigDraftToStorage,
+  saveConfigToStorage,
+  type GameConfig,
+} from "../constants/gameConfig";
+
+interface LocationState {
+  mode?: string;
+  minionCount?: number;
+  strategies?: Record<string, StrategyData>;
+  config?: GameConfig;
+  gameID?: string;
+}
 
 const ConfigurationFile = () => {
-     const navigate = useNavigate();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = (location.state as LocationState | null) || {};
+  const sessionState = loadGameSessionFromStorage();
+  const sessionGameID = sessionState?.gameID;
+  const { mode, minionCount = 1, strategies = {}, gameID: stateGameID } = state;
+  const gameID = stateGameID ?? sessionGameID;
+  const fallbackConfig = loadConfigFromStorage();
+  const draftConfig = loadConfigDraftFromStorage();
+  const initialConfig = state.config || fallbackConfig;
+
+  const [formData, setFormData] = useState(() => draftConfig || createGameConfigFormFromConfig(initialConfig));
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+
+  const handleChange = (key: (typeof GAME_CONFIG_FIELDS)[number]["key"], value: string) => {
+    setFormData((prev) => {
+      const next = { ...prev, [key]: value };
+      saveConfigDraftToStorage(next);
+      return next;
+    });
+  };
+
+  const handleConfirm = async () => {
+    const validation = parseGameConfigForm(formData);
+
+    if (!validation.isValid) {
+      if (validation.missing.length > 0) {
+        if (validation.missing.length > 3) {
+          setAlertMessage("Please fill in all fields");
+          return;
+        }
+
+        setAlertMessage(`Missing: ${validation.missing.join(", ")}`);
+        return;
+      }
+
+      if (validation.invalid.length > 0) {
+        setAlertMessage(`Must be non-negative numbers: ${validation.invalid.join(", ")}`);
+        return;
+      }
+    }
+
+    saveConfigToStorage(validation.config);
+    clearConfigDraftStorage();
+    try {
+      if (gameID) {
+        const response = await API.createConfig({
+          gameID,
+          ...validation.config,
+        });
+        console.log("Response from server (Config):", response);
+      } else {
+        console.warn("No gameID provided to ConfigurationFile; skipping backend config save.");
+      }
+
+      navigate("/minions", {
+        state: {
+          mode,
+          minionCount,
+          strategies,
+          config: validation.config,
+          gameID,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating config:", error);
+      setAlertMessage("Failed to save configuration to server");
+    }
+  };
+
+  const handleBack = () => {
+    navigate("/minions", {
+      state: {
+        mode,
+        minionCount,
+        strategies,
+        gameID,
+      },
+    });
+  };
 
 
   return (
-    <div className="relative w-screen h-screen flex items-center justify-center bg-[#e5e5e5] overflow-hidden">
-      {/* กล่องจัดสัดส่วน 16:9 */}
-      <div style={{ position: "relative", height: "100%", aspectRatio: "16/9" }}>
-        
-        {/* รูปพื้นหลัง SVG */}
+    <div>
+      <div>
         <img
           src={ConfigSVG}
           alt="Background"
-          style={{ width: "100%", height: "100%", objectFit: "contain" }}
+          className="background"
         />
+
+        <div className="config-fields-grid">
+          {GAME_CONFIG_FIELDS.map((field) => (
+            <label key={field.key} className="config-field-item" htmlFor={field.key}>
+              <span className="medieval-Sharp fs-45 config-field-label">{field.label} :</span>
+              <input
+                id={field.key}
+                type="number"
+                min="0"
+                value={formData[field.key]}
+                onChange={(e) => handleChange(field.key, e.target.value)}
+                className="config-inline-input"
+              />
+            </label>
+          ))}
+        </div>
+
+        {alertMessage && (
+          <CustomAlert
+            message={alertMessage}
+            boxWidth={700}
+            boxHeight={150}
+            boxPadding={40}
+            top={30}
+            left={580}
+            fontSize="80px"
+            onClose={() => setAlertMessage(null)}
+          />
+        )}
+
       </div>
-    {/* ปุ่ม Confirm (Props เดิมเป๊ะๆ) */}
-            <DesignedButton
-              onClick={() => navigate("/minions")}
-              color="#4C5921"
-              top="87%"
-              left="76.2%"
-              style={{
-                width: 400,
-                height: 82,
-                fontSize: "60px",
-                objectFit: "contain",
-                borderRadius: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div>
-                <span
-                  className="medieval-Sharp"
-                  ref={(el) => {
-                    if (el)
-                      el.style.setProperty("font-size", "55px", "important");
-                  }}
-                  style={{
-                    position: "relative",
-                    lineHeight: "1",
-                    display: "block",
-                  }}
-                >
-                  Confirm
-                </span>
-              </div>
-            </DesignedButton>
 
-            {/* ปุ่ม Back (Props เดิมเป๊ะๆ) */}
-            <DesignedButton
-              onClick={() =>
-                navigate("/minions")
-              }
-              color="transparent"
-              top="3.5%"
-              left="2%"
-              style={{
-                backgroundColor: "transparent",
-                width: "12%",
-                height: "12%",
-                padding: 0,
-                border: "none",
-                boxShadow: "none",
-              }}
-            >
-              <div
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <img
-                  src={BackIconSvg}
-                  alt="Back"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                  }}
-                />
-                <span
-                  className="medieval-Sharp"
-                  ref={(el) => {
-                    if (el)
-                      el.style.setProperty("font-size", "45px", "important");
-                  }}
-                  style={{
-                    position: "absolute",
-                    color: "#D3B14D",
-                    left: "70%",
-                    transform: "translateX(-50%)",
-                    pointerEvents: "none",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Back
-                </span>
-              </div>
-            </DesignedButton>
+      
+
+      {/* Confirm Button */}
+      <DesignedButton
+        onClick={handleConfirm}
+        color="#4C5921"
+        top="87%"
+        left="76.2%"
+        className="confirm-btn"
+      >
+        <span className="medieval-Sharp confirm-text fs-60">
+          Confirm
+        </span>
+      </DesignedButton>
+
+      {/* Back Button */}
+      <DesignedButton
+        onClick={handleBack}
+        color="transparent"
+        disableHover
+        top="3.5%"
+        left="2%"
+        className="back-btn"
+      >
+        <div className="back-wrapper">
+
+          <img
+            src={BackIconSvg}
+            alt="Back"
+            className="back-icon"
+          />
+
+          <span className="medieval-Sharp back-text fs-45">
+            Back
+          </span>
+
+        </div>
+      </DesignedButton>
+
+      
     </div>
-  )
-}
+  );
+};
 
-export default ConfigurationFile
+export default ConfigurationFile;

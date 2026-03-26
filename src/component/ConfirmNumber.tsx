@@ -1,140 +1,112 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ConfirmSvg from "../SVG/ConfirmNumber.svg";
 import BackIconSvg from "../SVG/BackBtn.svg";
 import DesignedButton from "./DesignedButton";
+import { API } from "../api";
+import { ALL_CHARACTERS } from "../constants/minionData";
+
 
 const ConfirmNumber = () => {
   const navigate = useNavigate();
   const [count, setCount] = useState(1);
+  const location = useLocation();
+  const mode = location.state?.mode || "Solitaire";
+  const gameID = location.state?.gameID || "";
+
+  const handleConfirm = async () => {
+    try {
+      // เรียกใช้ API ส่งจำนวน Minion และ GameID ที่รับมาจาก state
+      const response = await API.createNumberOfMinion({ numberOfMinion: count, gameID });
+      console.log("Response from server (Number of Minions):", response);
+
+      // response คาดว่าเป็น List<UUID> สำหรับ minion type แต่ละตัว (ตามลำดับ)
+      const uuidList: string[] = Array.isArray(response) ? response : [];
+
+      uuidList.forEach((uuid, index) => {
+        if (ALL_CHARACTERS[index]) {
+          ALL_CHARACTERS[index].id = uuid;
+        }
+      });
+
+      navigate("/minions", {
+        state: {
+          mode,
+          gameID,
+          minionCount: count,
+        },
+      });
+    } catch (error) {
+      console.error("Error setting number of minions:", error);
+    }
+  };
 
   return (
-    <div className="relative w-screen h-screen flex items-center justify-center bg-[#e5e5e5] overflow-hidden">
-      {/* กล่องจัดสัดส่วน 16:9 */}
-      <div style={{ position: "relative", height: "100%", aspectRatio: "16/9" }}>
-        
-        {/* รูปพื้นหลัง SVG */}
+    <div>
+      <div>
+        {/* Background */}
         <img
           src={ConfirmSvg}
           alt="Background"
-          style={{ width: "100%", height: "100%", objectFit: "contain" }}
+          className="background"
         />
 
-        {/* --- วางปุ่มทับลงบนรูปภาพ --- */}
-
-        {/* 1. ปุ่ม Back (ด้านซ้าย) */}
+        {/* Back Button */}
         <DesignedButton
-          onClick={() => navigate("/")}
-          color="transparent" // ล้างสีพื้นหลัง default
+          onClick={() => {
+            
+            navigate("/");
+          }}
+          disableHover
+          color="transparent"
           top="44%"
           left="2%"
-          style={{
-            backgroundColor: "transparent",
-            width: "12%",
-            height: "10%",
-            borderRadius: 0,
-            padding: 0,
-            overflow: "visible", // ให้ content ข้างในล้นได้ถ้าจำเป็น
-          }}
+          className="back-btn"
         >
-          <div style={{ position: "relative", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <img
-              src={BackIconSvg}
-              alt="Back"
-              style={{
-                width: "261px",
-                height: "90px",
-                objectFit: "contain",
-              }}
-            />
-            <span
-              className="medieval-Sharp"
-              ref={(el) => {
-                if (el) {
-                  el.style.setProperty("font-size", "55px", "important"); 
-                }
-              }}
-              style={{
-                position: "absolute",
-                fontSize: "60px",
-                color: "#D3B14D",
-                left: "75%", // ปรับตำแหน่งตัวอักษรให้ตรงกลางหัวลูกศร
-                transform: "translateX(-50%)",
-                pointerEvents: "none",
-              }}
-            >
-              Back
-            </span>
+          <div className="back-wrapper">
+            <img src={BackIconSvg} alt="Back" className="back-icon" />
+            <span className="medieval-Sharp back-text fs-45">Back</span>
           </div>
         </DesignedButton>
 
-        {/* 2. ลูกศรลดตัวเลข < */}
+        {/* Arrow Left */}
         <DesignedButton
           onClick={() => setCount((prev) => (prev > 1 ? prev - 1 : 1))}
-          top="45%"
+          disableHover
+          top="46%"
           left="29%"
           color="transparent"
-          fontColor="#5E1B28"
-          style={{
-            backgroundColor: "transparent",
-            width: "6%",
-            height: "10%",
-            borderRadius: 0,
-            padding: 0,
-          }}
+          className="arrow-btn"
         >
-          <span style={{ fontSize: "120px", fontWeight: "bold", lineHeight: 0 }}>{"<"}</span>
+          <span className="arrow-text medieval-Sharp">{"<"}</span>
         </DesignedButton>
 
-        {/* 3. ลูกศรเพิ่มตัวเลข > */}
+        {/* Arrow Right */}
         <DesignedButton
           onClick={() => setCount((prev) => (prev < 5 ? prev + 1 : 5))}
-          top="45%"
-          left="65%" // ปรับจาก right เป็น left เพื่อให้ทำงานร่วมกับ absolute ของ component ได้ดีขึ้น
+          disableHover
+          top="46%"
+          left="65%"
           color="transparent"
-          fontColor="#5E1B28"
-          style={{
-            backgroundColor: "transparent",
-            width: "6%",
-            height: "10%",
-            borderRadius: 0,
-            padding: 0,
-          }}
+          className="arrow-btn"
         >
-          <span style={{ fontSize: "120px", fontWeight: "bold", lineHeight: 0 }}>{">"}</span>
+          <span className="arrow-text medieval-Sharp">{">"}</span>
         </DesignedButton>
 
-        {/* 4. ตัวเลข (กึ่งกลาง) */}
-        <div
-          style={{
-            position: "absolute",
-            top: "48%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            fontSize: "250px",
-            fontFamily: "'Uncial Antiqua', serif",
-            color: "#101324",
-            pointerEvents: "none",
-          }}
-        >
-          {count}
+        {/* Number */}
+        <div className="confirm-number big-number uncial-font">
+          <span>{count}</span>
         </div>
 
-        {/* 5. ปุ่ม Confirm (ด้านล่าง) */}
+        {/* Confirm Button */}
         <DesignedButton
-          onClick={() => navigate("/minions" ,{ state: { minionCount: count }})}
-          color="#4C5921" // เปลี่ยนเป็นสีเขียว
+          onClick={handleConfirm}
+          color="#4C5921"
           top="75%"
           left="50%"
-          style={{
-            transform: "translateX(-50%)", // จัดให้อยู่กึ่งกลางจอพอดี
-            width: 540,
-            height: 140,
-            fontSize: "60px",
-            borderRadius: 0
-          }}
+          className="confirm-btn confirm-center"
         >
-          confirm
+          <span className="medieval-Sharp confirm-text fs-60">Confirm</span>
         </DesignedButton>
       </div>
     </div>

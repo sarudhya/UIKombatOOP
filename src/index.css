@@ -1,20 +1,744 @@
-@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Jacquard+24&display=swap");
+
+/* ---------- DESIGN TOKENS ---------- */
+
+:root {
+  --color-gold: #d3b14d;
+  --color-cream: #eee2b8;
+  --color-maroon: #902e01;
+  --color-blue-dark: #101324;
+  --color-green-deep: #5a7032;
+  --color-mahogany: #2A0B11;
+  --color-alert-bg: rgba(0, 0, 0, 0.7);
+
+
+  --size-45: 45px;
+  --size-55: 55px;
+  --size-60: 60px;
+  --size-75: 75px;
+  --size-96: 96px;
+  --size-120: 120px;
+  --size-140: 140px;
+  --size-300: 300px;
+
+  --radius-md: 35px;
+
+  --z-base-button: 10;
+  --z-alert: 1000;
+}
+
+/* ---------- TYPOGRAPHY UTILITIES ---------- */
 
 .medieval-Sharp {
-  font-family: 'MedievalSharp', cursive !important;
-  font-size: 96px !important;
+  font-family: "MedievalSharp", sans-serif;
 }
 
-.UncialFont{
-  font-family: 'Uncial Antiqua';
-  font-size: 75px !important;
+.uncial-font {
+  font-family: "Uncial Antiqua", serif;
 }
 
-.BG{
-  width: 1920;
-  height: 1080;
-  background-size: auto;
-  background-image:  url('./SVG/Start.svg');
+.jacquard-24 {
+  font-family: "Jacquard 24", serif;
 }
 
+.fs-45 {
+  font-size: var(--size-45);
+}
+
+.fs-55 {
+  font-size: var(--size-55);
+}
+
+.fs-60 {
+  font-size: var(--size-60);
+}
+
+.fs-75 {
+  font-size: var(--size-75);
+}
+
+.fs-96 {
+  font-size: var(--size-96);
+}
+
+.fs-120 {
+  font-size: var(--size-120);
+}
+
+.fs-140 {
+  font-size: var(--size-140);
+}
+
+.fs-300 {
+  font-size: var(--size-300);
+}
+
+
+/* ---------- LAYOUT UTILITIES ---------- */
+
+
+.background {
+  width: 100%;
+  min-height: 100%;  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+
+.board-playfield {
+  position: absolute;
+  inset: 0;
+  transform: rotate(0deg);
+  transition: transform 0s;
+}
+
+.board-playfield--flipped {
+  transform: rotate(180deg);
+}
+
+.w-full {
+  width: 100%;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ---------- COMPONENT PRIMITIVES ---------- */
+
+.btn {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: var(--z-base-button);
+}
+
+.mode-button {
+  width: 500px;
+  max-width: 90%;
+  height: 130px;
+  border-radius: var(--radius-md);
+}
+
+.confirm-btn {
+  width: 400px;
+  max-width: 90%;
+  height: 82px;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-text {
+  line-height: 1;
+  display: block;
+}
+
+.back-btn {
+  background-color: transparent;
+  width: 12%;
+  height: 12%;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.back-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.back-text {
+  position: absolute;
+  color: var(--color-gold);
+  left: 70%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.start-btn-text {
+  position: absolute;
+  color: var(--color-cream);
+  left: 25%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* ---------- FORM PRIMITIVES ---------- */
+
+.input-name,
+.input-defense {
+  background: var(--color-gold);
+  color: var(--color-maroon);
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  outline: none;
+}
+
+.input-name {
+  width: 100%;
+  height: 100px;
+  box-sizing: border-box;
+  padding: 0 18px;
+  line-height: 1;
+  display: block;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.file-box {
+  color: var(--color-cream);
+  padding: 20px;
+  border: dashed;
+}
+
+.upload-click-area {
+  width: 100%;
+  cursor: pointer;
+}
+
+.input-hidden {
+  display: none;
+}
+
+.icon-upload-add {
+  width: 80px;
+  margin-left: 10px;
+}
+
+.input-defense-compact {
+  width: 150px;
+  margin-left: 20px;
+}
+
+/* ---------- TEXT BLOCKS ---------- */
+
+.big-number {
+  font-family: "Uncial Antiqua", serif;
+  color: var(--color-blue-dark);
+}
+
+.defense-text {
+  color: var(--color-cream);
+}
+
+/* ---------- MINION LAYOUT ---------- */
+
+.card-minion {
+  width: 250px;
+  max-width: 25%;
+  height: 100%;
+  max-height: 600px;
+  position: relative;
+  flex-shrink: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.card-minion-clickable {
+  width: 20%;
+  height: 600px;
+  flex-shrink: 0;
+}
+
+.card-minion-media {
+  width: 100%;
+  height: 75%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-minion-media-scaled {
+  height: 450px;
+}
+
+.card-minion-image {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.card-minion-footer {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+.card-minion-overlay {
+  pointer-events: none;
+}
+
+.card-minion-strategy-label {
+  font-size: 60px;
+  color: var(--color-green-deep);
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.card-minion-check {
+  width: 50px;
+}
+
+/* ---------- STRATEGY PAGE ---------- */
+
+.strategy-layout {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 17%;
+  padding-top: 5%;
+  pointer-events: none;
+}
+
+.strategy-left {
+  width: 40%;
+  max-width: 520px;
+  height: 70%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 23%;
+  pointer-events: auto;
+}
+
+.strategy-right {
+  width: 30%;
+  max-width: 420px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.strategy-minion {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+}
+
+.minion-list-wrap {
+  position: absolute;
+  top: 48%;
+  left: 48%;
+  transform: translate(-50%, -40%);
+  width: 95%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.btn-config-file {
+  width: 600px;
+  height: 100px;
+  border-radius: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-single-line {
+  position: relative;
+  line-height: 1;
+  display: block;
+}
+
+.config-fields-grid {
+  position: absolute;
+  top: 60%;
+  left: 48%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, auto);
+  grid-auto-flow: column;
+  gap: 20px 10px;
+  align-items: center;
+}
+
+.config-field-item {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto;
+  align-items: center;
+  column-gap: 28px;
+}
+
+.config-field-label {
+  color: var(--color-cream);
+  line-height: 1;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.config-inline-input {
+  width: 150px;
+  height: 75px;
+  border: none;
+  outline: none;
+  border-radius: 8px;
+  padding: 0 10px;
+  text-align: center;
+  font-size: 40px;
+  font-family: "Uncial Antiqua", serif;
+  color: var(--color-cream);
+  background: var(--color-mahogany);
+}
+
+/* ---------- CONFIRM NUMBER PAGE ---------- */
+
+.confirm-number {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.confirm-number span {
+  font-size: clamp(100px, 20vw, 250px);
+}
+
+.arrow-btn {
+  background: transparent;
+  width: 6%;
+  height: 10%;
+  border-radius: 0;
+  padding: 0;
+}
+
+.arrow-text {
+  font-size: clamp(60px, 10vw, 120px);
+  font-weight: bold;
+  line-height: 0;
+  color: #5e1b28;
+}
+
+.confirm-center {
+  transform: translateX(-50%);
+}
+
+/* ---------- ALERT ---------- */
+
+.alert-container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-alert);
+}
+
+.alert-box {
+  position: absolute;
+  box-sizing: border-box;
+  width: 860px;
+  max-width: 90%;
+  height: 200px;
+  padding: 30px;
+  border: 1px solid var(--color-gold);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-alert-bg);
+  animation: alertFade 2.3s forwards;
+}
+
+.alert-message {
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  line-height: 1;
+}
+
+.alert-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 6px;
+  width: 100%;
+  background: var(--color-gold);
+  animation: countdown 2s linear forwards;
+}
+
+@keyframes countdown {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes alertFade {
+  0% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- MISC ---------- */
+
+.coin-shop-panel {
+  position: absolute;
+  width: clamp(220px, 15.9vw, 306px);
+  aspect-ratio: 306 / 1080;
+  max-height: 100%;
+  padding: 7px 0px;
+  z-index: 8;
+  overflow: hidden;
+}
+
+.coin-shop-list {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.coin-shop-item {
+  width: 100%;
+  height: clamp(0px, 8.5vw, 250px);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.coin-shop-item-media {
+  width: 100%;
+  height: 100%;
+  padding: 2px 0;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.coin-shop-item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transform-origin: center;
+}
+
+.coin-shop-item-name {
+  position: absolute;
+  left: 7%;
+  bottom: 110px;
+  color: var(--color-cream);
+  font-family: "Jacquard 24", serif;
+  font-size: 45px;  
+  -webkit-text-stroke: 1px var(--color-mahogany);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.grid-plus-icon {
+  width: 57px;
+  height: 57px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.coin-shop-panel--left {
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+}
+
+.coin-shop-panel--right {
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+.coin-shop-border-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.board-coinshop-trigger {
+  z-index: 30;
+}
+
+.board-coin-stack {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.board-coin-image {
+  display: block;
+  width: 235px;
+  height: 235px;
+  object-fit: contain;
+}
+
+.board-gold-label {
+  font-family: "Jacquard 24", serif;
+  position: absolute;
+  top: 37px;
+  left: 110px;
+  color: var(--color-cream);
+  font-size: 100px;
+  pointer-events: none;
+}
+
+.board-gold-max {
+  font-size: 0.45em;
+  letter-spacing: 0.04em;
+}
+
+.board-action-stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.board-buy-trigger {
+  position: absolute;
+  cursor: pointer;
+  z-index: var(--z-base-button);
+}
+
+.board-action-image {
+  display: block;
+  width: clamp(220px, 18vw, 372px);
+  height: auto;
+  object-fit: contain;
+}
+
+.board-paper-image {
+  width: clamp(220px, 19vw, 412px);
+}
+
+.board-paper-copy {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  line-height: 1;
+  color: var(--color-cream);
+  text-align: center;
+  text-shadow: 0 3px 0 var(--color-mahogany);
+  bottom: 200px;
+  font-size: clamp(16px, 1.4vw, 24px);
+}
+
+.board-paper-coin-icon {
+  width: 0.9em;
+  height: 0.9em;
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 6px;
+  transform: translateY(-20px);
+}
+
+.board-buy-inline-btn {
+  width: 200px;
+  height: 80px;
+  border-radius: 45px;
+}
+
+.board-available-turnlimit-label {
+  color: var(--color-cream);
+  letter-spacing: 0.02em;
+}
+
+.board-available-turnlimit-label--below {
+  margin-top: 1px;
+}
+
+
+.coin-shop-item-cost {
+  position: absolute;
+  font-family: "Jacquard 24", serif;
+  font-size: 80px;
+  top: 63px;
+  right: 30px;
+  color: var(--color-cream);
+  pointer-events: none;
+  z-index: 2;
+}
+
+
+/* ---------- SCROLLBAR / INPUT CLEANUP ---------- */
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+html,
+body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
